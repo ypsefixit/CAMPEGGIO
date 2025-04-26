@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -53,6 +52,16 @@
       <input type="file" id="resourcesFile" accept=".xlsx">
       <button onclick="uploadResources()">Carica</button>
       <p id="uploadResourcesMessage"></p>
+    </section>
+
+    <section class="update-section">
+      <h2>Occupa una Risorsa</h2>
+      <div class="form-group">
+        <label for="updateCode">Inserisci Codice Risorsa (4 caratteri):</label>
+        <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
+      </div>
+      <button onclick="updateAvailability()">Occupa</button>
+      <p id="updateMessage"></p>
     </section>
   </main>
 </body>
