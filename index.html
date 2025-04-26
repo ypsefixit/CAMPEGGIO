@@ -2,43 +2,56 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Campeggio Santa Margherita</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script defer src="script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campeggio Santa Margherita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
     <header>
-      <img src="logo.jpeg" alt="Logo Campeggio" class="logo">
-      <h1>CAMPEGGIO SANTA MARGHERITA</h1>
+        <img src="logo.jpeg" alt="Logo Campeggio">
+        <h1>CAMPEGGIO SANTA MARGHERITA</h1>
     </header>
-    <section class="search-section">
-      <div class="form-group">
-        <label for="dataRicerca">Libera fino al:</label>
-        <input type="date" id="dataRicerca">
-      </div>
-      <div class="form-group">
-        <label for="dimensioneRicerca">Lunghezza mezzo:</label>
-        <select id="dimensioneRicerca"></select>
-      </div>
-      <button id="cercaBtn" class="btn">Cerca</button>
-      <section id="risultatiContainer" class="results-section"></section>
-    </section>
-    <section class="upload-section">
-      <h2>Carica disponibilità risorse</h2>
-      <input type="file" id="fileDisponibilita">
-      <button id="caricaDisponibilitaBtn" class="btn">Carica</button>
-      <p id="messaggioDisponibilita" class="messaggio"></p>
-    </section>
-    <section class="upload-section">
-      <h2>Carica risorse (se necessario)</h2>
-      <input type="file" id="fileRisorse">
-      <button id="caricaRisorseBtn" class="btn">Carica</button>
-      <p id="messaggioRisorse" class="messaggio"></p>
-    </section>
-  </div>
+    <main>
+        <section class="search-section">
+            <form id="searchForm">
+                <label for="searchDate">Libera fino al:</label>
+                <input type="date" id="searchDate" name="searchDate" required>
+                <label for="searchSize">Lunghezza mezzo:</label>
+                <select id="searchSize" name="searchSize" required>
+                    <option value="">Seleziona...</option>
+                    <option value="5">5</option>
+                    <option value="5.5">5.5</option>
+                    <option value="6">6</option>
+                    <option value="6.5">6.5</option>
+                    <option value="7">7</option>
+                    <option value="7.5">7.5</option>
+                    <option value="8">8</option>
+                    <option value="8.5">8.5</option>
+                    <option value="9">9</option>
+                </select>
+                <button type="button" onclick="searchResources()">Cerca</button>
+            </form>
+            <div class="search-results" id="searchResults"></div>
+        </section>
+        <section class="upload-section">
+            <form id="uploadAvailabilityForm">
+                <label for="availabilityFile">Aggiorna disponibilità risorse:</label>
+                <input type="file" id="availabilityFile" accept=".xlsx">
+                <button type="button" onclick="uploadAvailability()">Carica</button>
+            </form>
+            <div class="message" id="uploadMessage"></div>
+        </section>
+        <section class="upload-section">
+            <form id="uploadResourcesForm">
+                <label for="resourcesFile">Aggiorna file risorse (se necessario):</label>
+                <input type="file" id="resourcesFile" accept=".xlsx">
+                <button type="button" onclick="uploadResources()">Carica</button>
+            </form>
+            <div class="message" id="uploadResourcesMessage"></div>
+        </section>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
