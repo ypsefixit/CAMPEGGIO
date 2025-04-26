@@ -1,0 +1,38 @@
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+header {
+  text-align: center;
+  padding: 10px;
+}
+.logo {
+  width: 150px;
+}
+h1 {
+  font-size: 24px;
+  margin: 0;
+}
+main {
+  padding: 10px;
+}
+.search-section, .upload-section {
+  margin-bottom: 20px;
+}
+button {
+  margin-top: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+table, th, td {
+  border: 1px solid black;
+}
+th, td {
+  padding: 5px;
+  text-align: center;
+}
