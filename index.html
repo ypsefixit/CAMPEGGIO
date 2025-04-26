@@ -11,20 +11,20 @@
   <script defer src="script.js"></script>
 </head>
 <body>
-  <header style="background: linear-gradient(to right, #00bcd4, #0097a7); padding: 20px; text-align: center; color: white;">
-    <img src="logo.png" alt="Logo Campeggio" style="width: 100px; height: auto;">
-    <h1 style="margin-top: 10px; font-size: 26px;">CAMPEGGIO SANTA MARGHERITA</h1>
+  <header>
+    <img src="logo.jpeg" alt="Logo Campeggio" class="logo">
+    <h1>CAMPEGGIO SANTA MARGHERITA</h1>
   </header>
 
-  <main style="padding: 20px;">
-    <section class="search-section" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
-      <div class="form-group" style="margin-bottom: 15px;">
+  <main>
+    <section class="search-section">
+      <div class="form-group">
         <label for="searchDate">Libera fino al:</label>
-        <input type="date" id="searchDate" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc;">
+        <input type="date" id="searchDate">
       </div>
-      <div class="form-group" style="margin-bottom: 15px;">
+      <div class="form-group">
         <label for="searchSize">Lunghezza mezzo:</label>
-        <select id="searchSize" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc;">
+        <select id="searchSize">
           <option value="5">5</option>
           <option value="5.5">5.5</option>
           <option value="6">6</option>
@@ -36,64 +36,24 @@
           <option value="9">9</option>
         </select>
       </div>
-      <button onclick="searchResources()" style="background: #ff7043; color: white; padding: 12px; border-radius: 8px; border: none; width: 100%; margin-top: 10px;">Cerca</button>
-
-      <div class="form-group" style="margin-top: 20px;">
-        <label for="resourceCode">Codice risorsa (4 caratteri):</label>
-        <input type="text" id="resourceCode" maxlength="4" placeholder="Inserisci codice" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc;">
-      </div>
-      <button onclick="occupyResource()" style="background: #29b6f6; color: white; padding: 12px; border-radius: 8px; border: none; width: 100%; margin-top: 10px;">Occupa</button>
+      <button onclick="searchResources()">Cerca</button>
     </section>
 
-    <section id="searchResults" style="margin-top: 20px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></section>
+    <section id="searchResults"></section>
 
-    <section class="upload-section" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 30px;">
+    <section class="upload-section">
       <h2>Carica disponibilità risorse</h2>
       <input type="file" id="availabilityFile" accept=".xlsx">
-      <button onclick="uploadAvailability()" style="background: #66bb6a; color: white; padding: 12px; border-radius: 8px; border: none; width: 100%; margin-top: 10px;">Carica</button>
+      <button onclick="uploadAvailability()">Carica</button>
       <p id="uploadMessage"></p>
     </section>
 
-    <section class="upload-section" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 30px;">
+    <section class="upload-section">
       <h2>Carica risorse</h2>
       <input type="file" id="resourcesFile" accept=".xlsx">
-      <button onclick="uploadResources()" style="background: #66bb6a; color: white; padding: 12px; border-radius: 8px; border: none; width: 100%; margin-top: 10px;">Carica</button>
+      <button onclick="uploadResources()">Carica</button>
       <p id="uploadResourcesMessage"></p>
     </section>
   </main>
-
-  <script>
-    function occupyResource() {
-      const code = document.getElementById('resourceCode').value.trim().toUpperCase();
-      if (!code || code.length !== 4) {
-        alert('Inserisci un codice valido di 4 caratteri.');
-        return;
-      }
-
-      const now = new Date();
-      const day = String(now.getDate()).padStart(2, '0');
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const year = String(now.getFullYear()).slice(-2);
-      const todayFormatted = `${day}/${month}/${year}`;
-
-      let found = false;
-
-      if (window.risorseData && Array.isArray(window.risorseData)) {
-        for (let resource of window.risorseData) {
-          if (resource.Codice && resource.Codice.toUpperCase() === code) {
-            resource.Disponibile = todayFormatted;
-            found = true;
-            break;
-          }
-        }
-      }
-
-      if (found) {
-        alert(`La risorsa ${code} è stata occupata con data ${todayFormatted}.`);
-      } else {
-        alert('Risorsa non trovata.');
-      }
-    }
-  </script>
 </body>
 </html>
