@@ -1,17 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Upload Disponibilità Excel</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Disponibilità - Elegante</title>
+  <link rel="stylesheet" href="style_elegante.css">
 </head>
 <body>
-    <h1>Upload File Excel Disponibilità</h1>
-    <input type="file" id="fileInput" accept=".xlsx, .xls" />
-    <button onclick="uploadDisponibilita()">Carica e Controlla</button>
+  <header>
+    <img src="logo.jpeg" alt="Logo" class="logo">
+    <h1>Carica la tua Disponibilità</h1>
+  </header>
+  <main>
+    <section class="upload-section">
+      <input type="file" id="fileInput" accept=".xlsx, .xls" />
+      <button onclick="uploadDisponibilita()">Carica e Controlla</button>
+    </section>
     <pre id="output"></pre>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
+  </main>
+  <footer>
+    <p>&copy; 2025 - Tutti i diritti riservati</p>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
