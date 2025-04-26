@@ -40,6 +40,16 @@
 
     <section id="searchResults"></section>
 
+    <section class="update-section">
+      <h2>Occupa una Risorsa</h2>
+      <div class="form-group">
+        <label for="updateCode">Inserisci Codice Risorsa (4 caratteri):</label>
+        <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
+      </div>
+      <button onclick="updateAvailability()">Occupa</button>
+      <p id="updateMessage"></p>
+    </section>
+    
     <section class="upload-section">
       <h2>Carica disponibilità risorse</h2>
       <input type="file" id="availabilityFile" accept=".xlsx">
@@ -54,15 +64,6 @@
       <p id="uploadResourcesMessage"></p>
     </section>
 
-    <section class="update-section">
-      <h2>Occupa una Risorsa</h2>
-      <div class="form-group">
-        <label for="updateCode">Inserisci Codice Risorsa (4 caratteri):</label>
-        <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
-      </div>
-      <button onclick="updateAvailability()">Occupa</button>
-      <p id="updateMessage"></p>
-    </section>
   </main>
 </body>
 </html>
