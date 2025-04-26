@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Campeggio Santa Margherita</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script defer src="script.js"></script>
@@ -24,6 +25,7 @@
         <select id="dimensioneRicerca"></select>
       </div>
       <button id="cercaBtn" class="btn">Cerca</button>
+      <section id="risultatiContainer" class="results-section"></section>
     </section>
     <section class="upload-section">
       <h2>Carica disponibilità risorse</h2>
@@ -36,8 +38,6 @@
       <input type="file" id="fileRisorse">
       <button id="caricaRisorseBtn" class="btn">Carica</button>
       <p id="messaggioRisorse" class="messaggio"></p>
-    </section>
-    <section id="risultatiContainer" class="results-section">
     </section>
   </div>
 </body>
