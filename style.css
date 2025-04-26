@@ -1,35 +1,39 @@
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Open Sans', Arial, sans-serif;
   font-size: 14px;
-  background: #f5f5f5;
+  background: #f9fafb;
   margin: 0;
   padding: 0;
+  color: #333;
 }
 .container {
   max-width: 900px;
-  margin: auto;
+  margin: 20px auto;
   padding: 20px;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 8px;
 }
 .logo {
   display: block;
   margin: 0 auto 10px;
-  max-width: 200px;
+  max-width: 180px;
 }
 header h1 {
   text-align: center;
   font-size: 22px;
   margin-bottom: 20px;
+  color: #1f2937;
 }
 .form-group {
   margin-bottom: 15px;
 }
 label {
   display: block;
-  font-weight: bold;
+  font-weight: 600;
   margin-bottom: 5px;
+  color: #374151;
 }
 input[type="date"],
 select {
@@ -37,25 +41,41 @@ select {
   padding: 10px;
   margin-bottom: 10px;
   font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  transition: border 0.3s;
+}
+input[type="date"]:focus,
+select:focus {
+  border-color: #3b82f6;
+  outline: none;
 }
 .btn {
-  background: #007bff;
+  background: #3b82f6;
   color: white;
   padding: 10px 15px;
   border: none;
   cursor: pointer;
   font-size: 14px;
+  border-radius: 6px;
   width: 100%;
   margin-bottom: 15px;
+  transition: background 0.3s;
 }
 .btn:hover {
-  background: #0056b3;
+  background: #2563eb;
 }
 .upload-section {
   margin-top: 30px;
 }
 .results-section {
   margin-top: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 table {
   width: 100%;
@@ -63,35 +83,42 @@ table {
   margin-top: 10px;
 }
 table, th, td {
-  border: 1px solid #ccc;
+  border: 1px solid #e5e7eb;
 }
 th, td {
-  padding: 8px;
+  padding: 10px;
   text-align: center;
   font-size: 14px;
+}
+th {
+  background: #f3f4f6;
+}
+tr:nth-child(even) {
+  background: #f9fafb;
 }
 .messaggio {
   font-style: italic;
   margin-top: 5px;
   font-size: 13px;
+  color: #10b981;
 }
 
 /* Responsive design */
 @media (max-width: 600px) {
   .container {
-    padding: 10px;
+    padding: 15px;
   }
   header h1 {
-    font-size: 18px;
+    font-size: 20px;
   }
   input[type="date"],
   select,
   .btn {
     font-size: 14px;
-    padding: 8px;
+    padding: 10px;
   }
   th, td {
-    padding: 6px;
-    font-size: 12px;
+    padding: 8px;
+    font-size: 13px;
   }
 }
