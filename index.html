@@ -7,20 +7,24 @@
     <title>Campeggio Santa Margherita</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
     <header>
-        <img src="logo.jpeg" alt="Logo Campeggio">
+        <img src="logo.jpeg" alt="Logo Campeggio" class="logo">
         <h1>CAMPEGGIO SANTA MARGHERITA</h1>
     </header>
+
     <main>
         <section class="search-section">
-            <form id="searchForm">
+            <div class="form-group">
                 <label for="searchDate">Libera fino al:</label>
-                <input type="date" id="searchDate" name="searchDate" required>
+                <input type="date" id="searchDate">
+            </div>
+            <div class="form-group">
                 <label for="searchSize">Lunghezza mezzo:</label>
-                <select id="searchSize" name="searchSize" required>
-                    <option value="">Seleziona...</option>
+                <select id="searchSize">
                     <option value="5">5</option>
                     <option value="5.5">5.5</option>
                     <option value="6">6</option>
@@ -31,27 +35,25 @@
                     <option value="8.5">8.5</option>
                     <option value="9">9</option>
                 </select>
-                <button type="button" onclick="searchResources()">Cerca</button>
-            </form>
-            <div class="search-results" id="searchResults"></div>
+            </div>
+            <button onclick="searchResources()">Cerca</button>
         </section>
+
+        <section id="searchResults"></section>
+
         <section class="upload-section">
-            <form id="uploadAvailabilityForm">
-                <label for="availabilityFile">Aggiorna disponibilità risorse:</label>
-                <input type="file" id="availabilityFile" accept=".xlsx">
-                <button type="button" onclick="uploadAvailability()">Carica</button>
-            </form>
-            <div class="message" id="uploadMessage"></div>
+            <h2>Carica disponibilità risorse</h2>
+            <input type="file" id="availabilityFile" accept=".xlsx">
+            <button onclick="uploadAvailability()">Carica</button>
+            <p id="uploadMessage"></p>
         </section>
+
         <section class="upload-section">
-            <form id="uploadResourcesForm">
-                <label for="resourcesFile">Aggiorna file risorse (se necessario):</label>
-                <input type="file" id="resourcesFile" accept=".xlsx">
-                <button type="button" onclick="uploadResources()">Carica</button>
-            </form>
-            <div class="message" id="uploadResourcesMessage"></div>
+            <h2>Carica risorse</h2>
+            <input type="file" id="resourcesFile" accept=".xlsx">
+            <button onclick="uploadResources()">Carica</button>
+            <p id="uploadResourcesMessage"></p>
         </section>
     </main>
-    <script src="script.js"></script>
 </body>
 </html>
