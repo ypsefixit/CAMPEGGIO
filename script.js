@@ -1,99 +1,126 @@
 
 let databaseRisorse = [];
 
-document.addEventListener("DOMContentLoaded", () => {
-  const oggi = new Date().toISOString().split("T")[0];
-  document.getElementById("dataRicerca").value = oggi;
+async function caricaRisorse() {
+    const response = await fetch('risorse.xlsx');
+    const data = await response.arrayBuffer();
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    const oggi = new Date().toLocaleDateString('it-IT');
+    databaseRisorse = json.map(riga => ({
+        risorsa: riga["risorsa"],
+        dimensione: parseFloat(riga["dimensione"]),
+        disponibile: riga["disponibile"] ? riga["disponibile"] : oggi
+    }));
+}
 
-  const dimensioneSelect = document.getElementById("dimensioneRicerca");
-  for (let i = 5; i <= 9; i += 0.5) {
-    const opt = document.createElement("option");
-    opt.value = i.toFixed(1);
-    opt.text = i.toFixed(1);
-    dimensioneSelect.appendChild(opt);
-  }
-
-  fetch("risorse.xlsx")
-    .then(res => res.arrayBuffer())
-    .then(buffer => processExcelRisorse(buffer));
-
-  document.getElementById("caricaDisponibilitaBtn").addEventListener("click", () => {
-    const fileInput = document.getElementById("fileDisponibilita");
-    const file = fileInput.files[0];
-    const msg = document.getElementById("messaggioDisponibilita");
-    if (!file) return msg.textContent = "Nessun file selezionato.";
-
+function aggiornaDisponibilita(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      try {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
+        const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const disponibilita = XLSX.utils.sheet_to_json(sheet);
-        disponibilita.forEach(item => {
-          const riga = databaseRisorse.find(r => r.risorsa === item.risorsa);
-          if (riga) riga.disponibile = item.disponibile;
+        const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        json.forEach(item => {
+            const index = databaseRisorse.findIndex(r => r.risorsa === item["risorsa"]);
+            if (index !== -1) {
+                databaseRisorse[index].disponibile = item["disponibile"];
+            }
         });
-        msg.textContent = "File caricato correttamente.";
-      } catch {
-        msg.textContent = "Errore durante il caricamento.";
-      }
+        document.getElementById('messaggioDisponibilita').textContent = "Disponibilità aggiornata con successo.";
     };
     reader.readAsArrayBuffer(file);
-  });
+}
 
-  document.getElementById("caricaRisorseBtn").addEventListener("click", () => {
-    const fileInput = document.getElementById("fileRisorse");
-    const file = fileInput.files[0];
-    const msg = document.getElementById("messaggioRisorse");
-    if (!file) return msg.textContent = "Nessun file selezionato.";
-
+function aggiornaRisorse(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      try {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
+        const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        processExcelRisorse(data);
-        msg.textContent = "File caricato correttamente.";
-      } catch {
-        msg.textContent = "Errore durante il caricamento.";
-      }
+        const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        const oggi = new Date().toLocaleDateString('it-IT');
+        databaseRisorse = json.map(riga => ({
+            risorsa: riga["risorsa"],
+            dimensione: parseFloat(riga["dimensione"]),
+            disponibile: riga["disponibile"] ? riga["disponibile"] : oggi
+        }));
+        document.getElementById('messaggioRisorse').textContent = "Risorse aggiornate con successo.";
     };
     reader.readAsArrayBuffer(file);
-  });
+}
 
-  document.getElementById("cercaBtn").addEventListener("click", () => {
-    const dataInput = document.getElementById("dataRicerca").value;
-    const dimInput = parseFloat(document.getElementById("dimensioneRicerca").value);
-    const risultati = databaseRisorse.filter(r => {
-      const d = r.disponibile.split("/").reverse().join("-");
-      return parseFloat(r.dimensione) >= dimInput && d >= dataInput;
-    }).sort((a, b) => {
-      const da = a.disponibile.split("/").reverse().join("-");
-      const db = b.disponibile.split("/").reverse().join("-");
-      return da.localeCompare(db) || parseFloat(a.dimensione) - parseFloat(b.dimensione) || a.risorsa.localeCompare(b.risorsa);
+function cercaRisorse() {
+    const dataInput = document.getElementById('dataInput').value;
+    const dimensioneInput = parseFloat(document.getElementById('dimensioneInput').value);
+
+    if (!dataInput || isNaN(dimensioneInput)) {
+        alert('Inserisci correttamente tutti i campi.');
+        return;
+    }
+
+    const dataSelezionata = dataInput.split("-").reverse().join("/"); // da yyyy-mm-dd a dd/mm/yyyy
+    const dataSelezionataDate = new Date(dataInput);
+
+    const risultati = databaseRisorse.filter(risorsa => {
+        const disponibileParts = risorsa.disponibile.split("/");
+        const disponibileDate = new Date(`20${disponibileParts[2]}-${disponibileParts[1]}-${disponibileParts[0]}`);
+        return (
+            risorsa.dimensione >= dimensioneInput &&
+            disponibileDate >= dataSelezionataDate
+        );
     });
 
-    const container = document.getElementById("risultatiContainer");
-    if (!risultati.length) return container.innerHTML = "<p>Nessun risultato trovato.</p>";
-    let html = "<table><tr><th>Risorsa</th><th>Dimensione</th><th>Disponibile</th></tr>";
+    mostraRisultati(risultati);
+}
+
+function mostraRisultati(risultati) {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = "";
+
+    if (risultati.length === 0) {
+        resultsDiv.innerHTML = "<p style='text-align:center; color: #ef4444;'>Nessun risultato trovato.</p>";
+        return;
+    }
+
+    risultati.sort((a, b) => {
+        const da = a.disponibile.split("/");
+        const db = b.disponibile.split("/");
+        const dataA = new Date(`20${da[2]}-${da[1]}-${da[0]}`);
+        const dataB = new Date(`20${db[2]}-${db[1]}-${db[0]}`);
+
+        if (dataA - dataB !== 0) return dataA - dataB;
+        if (a.dimensione - b.dimensione !== 0) return a.dimensione - b.dimensione;
+        return a.risorsa.localeCompare(b.risorsa);
+    });
+
+    const table = document.createElement('table');
+    const header = table.insertRow();
+    ["Risorsa", "Dimensione", "Disponibile"].forEach(text => {
+        const cell = header.insertCell();
+        cell.outerHTML = `<th>${text}</th>`;
+    });
+
     risultati.forEach(r => {
-      html += `<tr><td>${r.risorsa}</td><td>${r.dimensione}</td><td>${r.disponibile}</td></tr>`;
+        const row = table.insertRow();
+        row.insertCell().textContent = r.risorsa;
+        row.insertCell().textContent = r.dimensione.toFixed(2);
+        row.insertCell().textContent = r.disponibile;
     });
-    html += "</table>";
-    container.innerHTML = html;
-  });
+
+    resultsDiv.appendChild(table);
+}
+
+document.getElementById('uploadDisponibilita').addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        aggiornaDisponibilita(e.target.files[0]);
+    }
+});
+document.getElementById('uploadRisorse').addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        aggiornaRisorse(e.target.files[0]);
+    }
 });
 
-function processExcelRisorse(data) {
-  const workbook = XLSX.read(data, { type: "array" });
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const righe = XLSX.utils.sheet_to_json(sheet);
-  const oggi = new Date().toLocaleDateString("it-IT");
-  databaseRisorse = righe.map(r => ({
-    risorsa: r.risorsa,
-    dimensione: parseFloat(r.dimensione).toFixed(2),
-    disponibile: r.disponibile ? r.disponibile : oggi
-  }));
-}
+window.onload = caricaRisorse;
