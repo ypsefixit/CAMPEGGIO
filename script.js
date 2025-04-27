@@ -13,7 +13,7 @@ window.onload = async function() {
   try {
     const response = await fetch('risorse.xlsx');
     const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true }); // Aggiunto cellDates
+    const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
@@ -43,15 +43,19 @@ function uploadAvailability() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array', cellDates: true }); // <-- anche qui cellDates
+    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    console.log("Contenuto file caricato:", rows); // LOG DATI
 
     const updates = rows.slice(1);
 
     updates.forEach(row => {
       const risorsa = String(row[0] || '').trim();
       let disponibile = row[1];
+
+      console.log("Risorsa:", risorsa, "Disponibile raw:", disponibile, "Tipo:", typeof disponibile);
 
       if (disponibile instanceof Date) {
         const day = String(disponibile.getDate()).padStart(2, '0');
@@ -64,6 +68,14 @@ function uploadAvailability() {
           parts[2] = parts[2].slice(-2);
           disponibile = parts.join("/");
         }
+      } else if (typeof disponibile === 'number') {
+        // Se è numero seriale Excel, converti manualmente
+        const excelEpoch = new Date(1899, 11, 30);
+        excelEpoch.setDate(excelEpoch.getDate() + disponibile);
+        const day = String(excelEpoch.getDate()).padStart(2, '0');
+        const month = String(excelEpoch.getMonth() + 1).padStart(2, '0');
+        const year = String(excelEpoch.getFullYear()).slice(-2);
+        disponibile = `${day}/${month}/${year}`;
       }
 
       const item = databaserisorse.find(r => r.risorsa === risorsa);
@@ -98,7 +110,7 @@ function uploadResources() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array', cellDates: true }); // Aggiunto anche qui per sicurezza
+    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
