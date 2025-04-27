@@ -166,31 +166,28 @@ function updateAvailability() {
 
     const code = codeInput.value.trim().toUpperCase();
 
-    // 1. Controllo che ci sia il codice e sia lungo 4 caratteri
     if (!code || code.length !== 4) {
         message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
         return;
     }
 
-    // 2. Controllo che resources sia caricato
-    if (!resources || resources.length === 0) {
+    if (!databaserisorse || databaserisorse.length === 0) {
         message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
         return;
     }
 
-    // 3. Cerca la risorsa
-    const resource = resources.find(r => r.Codice === code);
+    const resource = databaserisorse.find(r => {
+        const resCode = (r.risorsa || '').trim().toUpperCase();
+        return resCode === code;
+    });
 
     if (resource) {
-        resource.Disponibile = 'NO';
-        message.innerText = `✅ La risorsa ${code} è stata aggiornata come occupata.`;
-
-        // 4. Aggiorna la lista visibile (se presente)
-        renderResources(resources);
-
-        // 5. (Opzionale) Resetta il campo input
+        resource.disponibile = getFormattedDate(); // inserisce la data odierna
+        message.innerText = `✅ La risorsa ${code} è stata occupata oggi (${resource.disponibile}).`;
+        renderResources(databaserisorse);
         codeInput.value = '';
     } else {
         message.innerText = '❌ Risorsa non trovata.';
     }
 }
+
