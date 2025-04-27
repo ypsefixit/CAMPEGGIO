@@ -161,31 +161,36 @@ function searchResources() {
 }
 
 function updateAvailability() {
-  const code = document.getElementById('updateCode').value.trim().toUpperCase();
-  const updateMessage = document.getElementById('updateMessage');
-  
-  if (code.length !== 4) {
-    updateMessage.textContent = "Inserisci un codice valido di 4 caratteri.";
-    return;
-  }
-  
-  const formattedDate = getFormattedDate();
+    const codeInput = document.getElementById('updateCode');
+    const message = document.getElementById('updateMessage');
 
-  let found = false;
+    const code = codeInput.value.trim().toUpperCase();
 
-if (Array.isArray(databaserisorse)) {
-  for (let i = 0; i < databaserisorse.length; i++) {
-    if (databaserisorse[i].risorsa && databaserisorse[i].risorsa.toUpperCase() === code) {
-      databaserisorse[i].disponibile = formattedDate;
-      found = true;
-      break;
+    // 1. Controllo che ci sia il codice e sia lungo 4 caratteri
+    if (!code || code.length !== 4) {
+        message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
+        return;
     }
-  }
-}
 
-  if (found) {
-    updateMessage.textContent = `Disponibilità aggiornata per il codice ${code}.`;
-  } else {
-    updateMessage.textContent = `Codice ${code} non trovato.`;
-  }
+    // 2. Controllo che resources sia caricato
+    if (!resources || resources.length === 0) {
+        message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
+        return;
+    }
+
+    // 3. Cerca la risorsa
+    const resource = resources.find(r => r.Codice === code);
+
+    if (resource) {
+        resource.Disponibile = 'NO';
+        message.innerText = `✅ La risorsa ${code} è stata aggiornata come occupata.`;
+
+        // 4. Aggiorna la lista visibile (se presente)
+        renderResources(resources);
+
+        // 5. (Opzionale) Resetta il campo input
+        codeInput.value = '';
+    } else {
+        message.innerText = '❌ Risorsa non trovata.';
+    }
 }
