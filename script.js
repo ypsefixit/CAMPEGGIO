@@ -16,11 +16,11 @@ window.onload = async function() {
     const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-    databaserisorse = data.slice(1).map(row => ({
-      risorsa: String(row[0] || '').trim(),
-      dimensione: parseFloat(row[1]) || 0,
+    databaserisorse = data.map(row => ({
+      risorsa: String(row["Risorse"] || '').trim(),
+      dimensione: parseFloat(row["Dimensione"] || 0),
       disponibile: getFormattedDate()
     }));
 
@@ -45,22 +45,23 @@ function uploadAvailability() {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: 'array', cellDates: true });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-    console.log("Contenuto file caricato:", rows); // LOG DATI
-
-    const updates = rows.slice(1);
-
-    updates.forEach(row => {
-      const risorsa = String(row[0] || '').trim();
-      let disponibile = row[1];
-
-      console.log("Risorsa:", risorsa, "Disponibile raw:", disponibile, "Tipo:", typeof disponibile);
+    rows.forEach(row => {
+      const risorsa = String(row["Risorse"] || '').trim();
+      let disponibile = row["Data"];
 
       if (disponibile instanceof Date) {
         const day = String(disponibile.getDate()).padStart(2, '0');
         const month = String(disponibile.getMonth() + 1).padStart(2, '0');
         const year = String(disponibile.getFullYear()).slice(-2);
+        disponibile = `${day}/${month}/${year}`;
+      } else if (typeof disponibile === 'number') {
+        const excelEpoch = new Date(1899, 11, 30);
+        excelEpoch.setDate(excelEpoch.getDate() + disponibile);
+        const day = String(excelEpoch.getDate()).padStart(2, '0');
+        const month = String(excelEpoch.getMonth() + 1).padStart(2, '0');
+        const year = String(excelEpoch.getFullYear()).slice(-2);
         disponibile = `${day}/${month}/${year}`;
       } else if (typeof disponibile === 'string') {
         let parts = disponibile.split("/");
@@ -68,14 +69,6 @@ function uploadAvailability() {
           parts[2] = parts[2].slice(-2);
           disponibile = parts.join("/");
         }
-      } else if (typeof disponibile === 'number') {
-        // Se è numero seriale Excel, converti manualmente
-        const excelEpoch = new Date(1899, 11, 30);
-        excelEpoch.setDate(excelEpoch.getDate() + disponibile);
-        const day = String(excelEpoch.getDate()).padStart(2, '0');
-        const month = String(excelEpoch.getMonth() + 1).padStart(2, '0');
-        const year = String(excelEpoch.getFullYear()).slice(-2);
-        disponibile = `${day}/${month}/${year}`;
       }
 
       const item = databaserisorse.find(r => r.risorsa === risorsa);
@@ -112,17 +105,13 @@ function uploadResources() {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, { type: 'array', cellDates: true });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-    databaserisorse = rows.slice(1).map(row => {
-      const risorsa = String(row[0] || '').trim();
-      const dimensione = parseFloat(row[1]);
-      return {
-        risorsa: risorsa,
-        dimensione: isNaN(dimensione) ? 0 : dimensione,
-        disponibile: getFormattedDate()
-      };
-    });
+    databaserisorse = rows.map(row => ({
+      risorsa: String(row["Risorse"] || '').trim(),
+      dimensione: parseFloat(row["Dimensione"] || 0),
+      disponibile: getFormattedDate()
+    }));
 
     uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
     uploadResourcesMessage.style.color = "green";
