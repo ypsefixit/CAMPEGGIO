@@ -50,13 +50,21 @@ function uploadAvailability() {
 
     updates.forEach(row => {
       const risorsa = String(row[0] || '').trim();
-      let disponibile = String(row[1] || '').trim();
+      let disponibile = row[1];
 
-      // Normalizza la data a gg/mm/aa
-      let parts = disponibile.split("/");
-      if (parts.length === 3 && parts[2].length === 4) {
-        parts[2] = parts[2].slice(-2); // Taglia anno a 2 cifre
-        disponibile = parts.join("/");
+      if (disponibile instanceof Date) {
+        // Se è una vera data
+        const day = String(disponibile.getDate()).padStart(2, '0');
+        const month = String(disponibile.getMonth() + 1).padStart(2, '0');
+        const year = String(disponibile.getFullYear()).slice(-2);
+        disponibile = `${day}/${month}/${year}`;
+      } else if (typeof disponibile === 'string') {
+        // Se è già testo, normalizziamo
+        let parts = disponibile.split("/");
+        if (parts.length === 3 && parts[2].length === 4) {
+          parts[2] = parts[2].slice(-2); // Taglia anno a 2 cifre
+          disponibile = parts.join("/");
+        }
       }
 
       const item = databaserisorse.find(r => r.risorsa === risorsa);
@@ -76,6 +84,7 @@ function uploadAvailability() {
 
   reader.readAsArrayBuffer(file);
 }
+
 
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
