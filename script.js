@@ -173,15 +173,15 @@ function updateAvailability() {
 
   let found = false;
 
-  if (Array.isArray(resources)) {
-    for (let i = 0; i < resources.length; i++) {
-      if (resources[i].risorsa && resources[i].risorsa.toUpperCase() === code) {
-        resources[i].disponibile = formattedDate;
-        found = true;
-        break;
-      }
+if (Array.isArray(databaserisorse)) {
+  for (let i = 0; i < databaserisorse.length; i++) {
+    if (databaserisorse[i].risorsa && databaserisorse[i].risorsa.toUpperCase() === code) {
+      databaserisorse[i].disponibile = formattedDate;
+      found = true;
+      break;
     }
   }
+}
 
   if (found) {
     updateMessage.textContent = `Disponibilità aggiornata per il codice ${code}.`;
