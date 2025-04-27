@@ -1,5 +1,12 @@
-
 let databaserisorse = [];
+
+function getFormattedDate() {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = String(today.getFullYear()).slice(-2); // Anno a 2 cifre
+  return `${day}/${month}/${year}`;
+}
 
 window.onload = async function() {
   try {
@@ -13,7 +20,7 @@ window.onload = async function() {
     databaserisorse = data.slice(1).map(row => ({
       risorsa: String(row[0] || '').trim(),
       dimensione: parseFloat(row[1]) || 0,
-      disponibile: new Date().toLocaleDateString('it-IT')
+      disponibile: getFormattedDate()
     }));
 
   } catch (error) {
@@ -39,11 +46,18 @@ function uploadAvailability() {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
     
-    const updates = rows.slice(1); // Salta intestazione
+    const updates = rows.slice(1);
 
     updates.forEach(row => {
       const risorsa = String(row[0] || '').trim();
-      const disponibile = String(row[1] || '').trim();
+      let disponibile = String(row[1] || '').trim();
+
+      // Normalizza la data a gg/mm/aa
+      let parts = disponibile.split("/");
+      if (parts.length === 3 && parts[2].length === 4) {
+        parts[2] = parts[2].slice(-2); // Taglia anno a 2 cifre
+        disponibile = parts.join("/");
+      }
 
       const item = databaserisorse.find(r => r.risorsa === risorsa);
       if (item && disponibile) {
@@ -84,7 +98,7 @@ function uploadResources() {
     databaserisorse = rows.slice(1).map(row => ({
       risorsa: String(row[0] || '').trim(),
       dimensione: parseFloat(row[1]) || 0,
-      disponibile: new Date().toLocaleDateString('it-IT')
+      disponibile: getFormattedDate()
     }));
 
     uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
@@ -114,15 +128,20 @@ function searchResources() {
 
   const filtered = databaserisorse.filter(r => {
     const resDateParts = r.disponibile.split("/");
-    const resDateObj = new Date(`20${resDateParts[2]}`, resDateParts[1] - 1, resDateParts[0]);
+    const year = parseInt(resDateParts[2], 10);
+    const fullYear = 2000 + year; // Anno completo a partire da 2000
+    const resDateObj = new Date(fullYear, resDateParts[1] - 1, resDateParts[0]);
     const searchDateObj = new Date(searchDate);
 
     return r.dimensione >= searchSize && resDateObj >= searchDateObj;
   });
 
   filtered.sort((a, b) => {
-    const dateA = new Date(a.disponibile.split("/").reverse().join("-"));
-    const dateB = new Date(b.disponibile.split("/").reverse().join("-"));
+    const dateAparts = a.disponibile.split("/");
+    const dateBparts = b.disponibile.split("/");
+    const dateA = new Date(2000 + parseInt(dateAparts[2], 10), dateAparts[1] - 1, dateAparts[0]);
+    const dateB = new Date(2000 + parseInt(dateBparts[2], 10), dateBparts[1] - 1, dateBparts[0]);
+    
     if (dateA - dateB !== 0) return dateA - dateB;
     if (a.dimensione - b.dimensione !== 0) return a.dimensione - b.dimensione;
     return a.risorsa.localeCompare(b.risorsa);
@@ -150,8 +169,7 @@ function updateAvailability() {
     return;
   }
   
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString('it-IT');
+  const formattedDate = getFormattedDate();
 
   let found = false;
 
@@ -166,7 +184,7 @@ function updateAvailability() {
   }
 
   if (found) {
-    updateMessage.textContent = `DisponibilitÃ  aggiornata per il codice ${code}.`;
+    updateMessage.textContent = `Disponibilità aggiornata per il codice ${code}.`;
   } else {
     updateMessage.textContent = `Codice ${code} non trovato.`;
   }
