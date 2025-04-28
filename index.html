@@ -41,12 +41,16 @@
     <section id="searchResults"></section>
 
     <section class="update-section">
-      <h2>Occupa una Risorsa</h2>
+      <h2>Aggiorna una Risorsa</h2>
       <div class="form-group">
-        <label for="updateCode">Inserisci Codice Risorsa (4 caratteri):</label>
+        <label for="updateCode">Risorsa (4 caratteri):</label>
         <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
       </div>
-      <button onclick="updateAvailability()">Occupa</button>
+      <div class="form-group">
+        <label for="updateDate">Libera fino a (facoltativo):</label>
+        <input type="date" id="updateDate">
+      </div>
+      <button onclick="updateAvailability()">Aggiorna</button>
       <p id="updateMessage"></p>
     </section>
     
