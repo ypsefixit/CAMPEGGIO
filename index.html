@@ -6,7 +6,7 @@
   <title>Campeggio Santa Margherita</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script defer src="script.js"></script>
 </head>
 <body>
@@ -56,14 +56,14 @@
     
     <section class="upload-section">
       <h2>Carica disponibilità risorse</h2>
-      <input type="file" id="availabilityFile" accept=".xlsx">
+      <input type="file" id="availabilityFile" accept=".csv">
       <button onclick="uploadAvailability()">Carica</button>
       <p id="uploadMessage"></p>
     </section>
 
     <section class="upload-section">
       <h2>Carica risorse</h2>
-      <input type="file" id="resourcesFile" accept=".xlsx">
+      <input type="file" id="resourcesFile" accept=".csv">
       <button onclick="uploadResources()">Carica</button>
       <p id="uploadResourcesMessage"></p>
     </section>
