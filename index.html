@@ -1,5 +1,5 @@
-<!DOCTYPE html>
 <html lang="it">
+  
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,19 +9,54 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script defer src="script.js"></script>
 </head>
+  
 <body>
-  <header>
-    <img src="logo.png" alt="Logo Campeggio" class="logo">
-    <h1>CAMPEGGIO SANTA MARGHERITA</h1>
-  </header>
+  
+    <img src="logo.png" alt="Logo Campeggio">
 
-  <main>
-    <section class="search-section">
-      <div class="form-group">
+    <h1>CAMPEGGIO</h1>
+    <h2>SANTA MARGHERITA</h2>
+
+  <div class="accordion">
+
+    <button class="accordion-button">Aggiorna risorse</button>
+    <div class="accordion-content">
+      <form id="form-aggiorna-database">
+        <label for="file-risorse">Lista risorse</label>
+        <input type="file" id="resourcesFile" accept=".csv">
+        <button onclick="uploadResources()">Carica</button>
+        <p id="uploadResourcesMessage"></p>
+     </form>
+    </div>
+
+    <button class="accordion-button">Aggiorna risorse libere</button>
+    <div class="accordion-content">
+      <form id="form-aggiorna-risorse">
+        <label for="file-risorse">Lista risorse libere</label>
+        <input type="file" id="availabilityFile" accept=".csv">
+        <button onclick="uploadAvailability()">Carica</button>
+        <p id="uploadMessage"></p>
+      </form>
+    </div>
+
+    <button class="accordion-button">Aggiorna singola risorsa</button>
+    <div class="accordion-content">
+      <form id="form-aggiorna-singola">
+        <label for="updateCode">Risorsa (4 caratteri):</label>
+        <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
+        <label for="updateDate">Libera fino a (facoltativo):</label>
+        <input type="date" id="updateDate">
+      <button onclick="updateAvailability()">Aggiorna</button>
+      <p id="updateMessage"></p>
+     </form>
+    </div>
+    
+    <button class="accordion-button">Ricerca disponibilità</button>
+      <div class="accordion-content">
+        <form id="form-ricerca">
         <label for="searchDate">Libera fino al:</label>
         <input type="date" id="searchDate">
-      </div>
-      <div class="form-group">
+    
         <label for="searchSize">Lunghezza mezzo:</label>
         <select id="searchSize">
           <option value="5">5</option>
@@ -34,40 +69,26 @@
           <option value="8.5">8.5</option>
           <option value="9">9</option>
         </select>
-      </div>
-      <button onclick="searchResources()">Cerca</button>
-    </section>
-
-    <section id="searchResults"></section>
-
-    <section class="update-section">
-      <h2>Aggiorna una Risorsa</h2>
-      <div class="form-group">
-        <label for="updateCode">Risorsa (4 caratteri):</label>
-        <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
-      </div>
-      <div class="form-group">
-        <label for="updateDate">Libera fino a (facoltativo):</label>
-        <input type="date" id="updateDate">
-      </div>
-      <button onclick="updateAvailability()">Aggiorna</button>
-      <p id="updateMessage"></p>
-    </section>
+      
+        <button onclick="searchResources()">Cerca</button>
     
-    <section class="upload-section">
-      <h2>Carica disponibilità risorse</h2>
-      <input type="file" id="availabilityFile" accept=".csv">
-      <button onclick="uploadAvailability()">Carica</button>
-      <p id="uploadMessage"></p>
-    </section>
+        </form>
+    </div>
 
-    <section class="upload-section">
-      <h2>Carica risorse</h2>
-      <input type="file" id="resourcesFile" accept=".csv">
-      <button onclick="uploadResources()">Carica</button>
-      <p id="uploadResourcesMessage"></p>
-    </section>
-
-  </main>
+</div>
+    
+   <table id="tabella-risultati">
+    <thead>
+      <tr>
+        <th>Risorsa</th>
+        <th>Dimensione</th>
+        <th>Libera fino a</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Risultati -->
+    </tbody>
+  </table>
+  
 </body>
 </html>
