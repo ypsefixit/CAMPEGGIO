@@ -16,6 +16,30 @@ function getTodayDate() {
   return `${year}-${month}-${day}`; // Formato YYYY-MM-DD
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+  const accordionButtons = document.querySelectorAll(".accordion-button");
+
+  accordionButtons.forEach(button => {
+    button.addEventListener("click", function () {
+      // Ottieni il contenuto associato
+      const accordionContent = this.nextElementSibling;
+
+      // Controlla se è già aperto
+      if (accordionContent.style.maxHeight) {
+        accordionContent.style.maxHeight = null; // Chiudi
+      } else {
+        // Chiudi tutti gli altri pannelli
+        document.querySelectorAll(".accordion-content").forEach(content => {
+          content.style.maxHeight = null;
+        });
+
+        // Mostra il contenuto corrente
+        accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+      }
+    });
+  });
+});
+
 window.onload = function() {
   const updateDateInput = document.getElementById('updateDate');
   if (updateDateInput) {
