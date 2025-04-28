@@ -92,6 +92,7 @@ function uploadAvailability() {
   reader.readAsArrayBuffer(file);
 }
 
+// Caricamento delle risorse da CSV
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
   const file = fileInput.files[0];
@@ -103,29 +104,23 @@ function uploadResources() {
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    databaserisorse = rows.slice(1).map(row => ({
-      risorsa: String(row[0] || '').trim(),
-      dimensione: parseFloat(row[1]) || 0,
-      disponibile: getFormattedDate()
-    }));
-
-    uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
-    uploadResourcesMessage.style.color = "green";
-  };
-
-  reader.onerror = function () {
-    uploadResourcesMessage.textContent = "Errore caricamento file.";
-    uploadResourcesMessage.style.color = "red";
-  };
-
-  reader.readAsArrayBuffer(file);
+  Papa.parse(file, {
+    header: true, // Utilizza la prima riga come intestazione
+    skipEmptyLines: true,
+    complete: function(results) {
+      databaserisorse = results.data.map(row => ({
+        risorsa: String(row['Risorsa'] || '').trim(),
+        dimensione: parseFloat(row['Dimensione']) || 0,
+        disponibile: row['Disponibile'] || getFormattedDate()
+      }));
+      uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
+      uploadResourcesMessage.style.color = "green";
+    },
+    error: function() {
+      uploadResourcesMessage.textContent = "Errore caricamento file.";
+      uploadResourcesMessage.style.color = "red";
+    }
+  });
 }
 
 function searchResources() {
