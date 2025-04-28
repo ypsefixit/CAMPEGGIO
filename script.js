@@ -8,6 +8,21 @@ function getFormattedDate() {
   return `${day}/${month}/${year}`;
 }
 
+function getTodayDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`; // Formato YYYY-MM-DD
+}
+
+window.onload = function() {
+  const updateDateInput = document.getElementById('updateDate');
+  if (updateDateInput) {
+    updateDateInput.value = getTodayDate();
+  }
+};
+
 window.onload = async function() {
   try {
     const response = await fetch('risorse.xlsx');
@@ -162,9 +177,11 @@ function searchResources() {
 
 function updateAvailability() {
     const codeInput = document.getElementById('updateCode');
+    const dateInput = document.getElementById('updateDate');
     const message = document.getElementById('updateMessage');
 
     const code = codeInput.value.trim().toUpperCase();
+    const selectedDate = dateInput.value;
 
     if (!code || code.length !== 4) {
         message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
@@ -182,10 +199,18 @@ function updateAvailability() {
     });
 
     if (resource) {
-        resource.disponibile = getFormattedDate(); // inserisce la data odierna
-        message.innerText = `✅ La risorsa ${code} è stata occupata oggi (${resource.disponibile}).`;
+        if (selectedDate) {
+            // Imposta la data selezionata come nuova data di disponibilità
+            const dateParts = selectedDate.split("-");
+            resource.disponibile = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Data in formato gg/mm/aaaa
+        } else {
+            // Se non viene specificata una data, usa quella odierna
+            resource.disponibile = getFormattedDate();
+        }
+        message.innerText = `✅ La risorsa ${code} è stata occupata con data (${resource.disponibile}).`;
         renderResources(databaserisorse);
         codeInput.value = '';
+        dateInput.value = '';
     } else {
         message.innerText = '❌ Risorsa non trovata.';
     }
