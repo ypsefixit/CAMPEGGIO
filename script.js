@@ -1,14 +1,10 @@
-<!-- Assicurati di avere PapaParse incluso -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-<script>
 let databaserisorse = [];
 
 function getFormattedDate() {
   const today = new Date();
   const day = String(today.getDate()).padStart(2, '0');
   const month = String(today.getMonth() + 1).padStart(2, '0');
-  const year = String(today.getFullYear()).slice(-2);
+  const year = String(today.getFullYear()).slice(-2); // Anno a 2 cifre
   return `${day}/${month}/${year}`;
 }
 
@@ -17,41 +13,7 @@ function getTodayDate() {
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function normalizeDate(inputDate) {
-  const parts = inputDate.split(/[\/\-]/);
-  if (parts.length === 3) {
-    let [d, m, y] = parts;
-    if (y.length === 4) y = y.slice(-2);
-    if (d.length === 4) [y, m, d] = [d.slice(-2), m, d];
-    return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
-  }
-  return getFormattedDate();
-}
-
-function parseDate(dateStr) {
-  const [d, m, y] = dateStr.split('/');
-  return new Date(2000 + parseInt(y), parseInt(m) - 1, parseInt(d));
-}
-
-function showMessage(element, message, color = 'black') {
-  if (element) {
-    element.textContent = message;
-    element.style.color = color;
-  }
-}
-
-function saveToLocalStorage() {
-  localStorage.setItem('databaserisorse', JSON.stringify(databaserisorse));
-}
-
-function loadFromLocalStorage() {
-  const data = localStorage.getItem('databaserisorse');
-  if (data) {
-    databaserisorse = JSON.parse(data);
-  }
+  return `${year}-${month}-${day}`; // Formato YYYY-MM-DD
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -60,18 +22,20 @@ document.addEventListener("DOMContentLoaded", function () {
   accordionButtons.forEach(button => {
     button.addEventListener("click", function () {
       const accordionContent = this.nextElementSibling;
+
       if (accordionContent.style.maxHeight) {
-        accordionContent.style.maxHeight = null;
+        accordionContent.style.maxHeight = null; // Chiudi
       } else {
         document.querySelectorAll(".accordion-content").forEach(content => {
           content.style.maxHeight = null;
         });
+
         accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
       }
     });
   });
 
-  loadFromLocalStorage();
+  // Caricamento automatico del file risorse.csv
   loadResourcesOnStartup();
 });
 
@@ -87,58 +51,81 @@ function loadResourcesOnStartup() {
 
   fetch('risorse.csv')
     .then(response => {
-      if (!response.ok) throw new Error(`Errore nel caricamento del file risorse.csv: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Errore nel caricamento del file risorse.csv: ${response.statusText}`);
+      }
       return response.text();
     })
     .then(csvText => {
       Papa.parse(csvText, {
-        header: true,
+        header: true, // Usa la prima riga come intestazione
         skipEmptyLines: true,
         complete: function (results) {
           databaserisorse = results.data.map(row => ({
             risorsa: String(row['Risorsa'] || '').trim(),
             dimensione: parseFloat(row['Dimensione']) || 0,
-            disponibile: normalizeDate(row['Disponibile'] || '')
+            disponibile: row['Disponibile'] || getFormattedDate()
           }));
-          saveToLocalStorage();
+
+          // Feedback visivo
           if (databaserisorse.length > 0) {
-            showMessage(uploadResourcesMessage, "Database risorse caricato correttamente all'avvio!", "green");
+            console.log("Database risorse caricato correttamente:", databaserisorse);
+            if (uploadResourcesMessage) {
+              uploadResourcesMessage.textContent = "Database risorse caricato correttamente all'avvio!";
+              uploadResourcesMessage.style.color = "green";
+            }
           } else {
-            showMessage(uploadResourcesMessage, "Il file risorse.csv è vuoto o non valido.", "red");
+            console.error("Il file risorse.csv è vuoto o non valido.");
+            if (uploadResourcesMessage) {
+              uploadResourcesMessage.textContent = "Il file risorse.csv è vuoto o non valido.";
+              uploadResourcesMessage.style.color = "red";
+            }
           }
         },
         error: function () {
-          showMessage(uploadResourcesMessage, "Errore nella lettura del file risorse.csv.", "red");
+          console.error("Errore nella lettura del file risorse.csv.");
+          if (uploadResourcesMessage) {
+            uploadResourcesMessage.textContent = "Errore nella lettura del file risorse.csv.";
+            uploadResourcesMessage.style.color = "red";
+          }
         }
       });
     })
-    .catch(error => showMessage(uploadResourcesMessage, error.message, "red"));
+    .catch(error => {
+      console.error(error.message);
+      if (uploadResourcesMessage) {
+        uploadResourcesMessage.textContent = error.message;
+        uploadResourcesMessage.style.color = "red";
+      }
+    });
 }
 
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
   const file = fileInput.files[0];
-  const msg = document.getElementById('uploadResourcesMessage');
+  const uploadResourcesMessage = document.getElementById('uploadResourcesMessage');
 
   if (!file) {
-    showMessage(msg, "Nessun file selezionato.", "red");
+    uploadResourcesMessage.textContent = "Nessun file selezionato.";
+    uploadResourcesMessage.style.color = "red";
     return;
   }
 
   Papa.parse(file, {
-    header: true,
+    header: true, // Utilizza la prima riga come intestazione
     skipEmptyLines: true,
     complete: function (results) {
       databaserisorse = results.data.map(row => ({
         risorsa: String(row['Risorsa'] || '').trim(),
         dimensione: parseFloat(row['Dimensione']) || 0,
-        disponibile: normalizeDate(row['Disponibile'] || '')
+        disponibile: row['Disponibile'] || getFormattedDate()
       }));
-      saveToLocalStorage();
-      showMessage(msg, "File risorse caricato correttamente!", "green");
+      uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
+      uploadResourcesMessage.style.color = "green";
     },
     error: function () {
-      showMessage(msg, "Errore caricamento file.", "red");
+      uploadResourcesMessage.textContent = "Errore caricamento file.";
+      uploadResourcesMessage.style.color = "red";
     }
   });
 }
@@ -146,10 +133,11 @@ function uploadResources() {
 function uploadAvailability() {
   const fileInput = document.getElementById('availabilityFile');
   const file = fileInput.files[0];
-  const msg = document.getElementById('uploadMessage');
+  const uploadMessage = document.getElementById('uploadMessage');
 
   if (!file) {
-    showMessage(msg, "Nessun file selezionato.", "red");
+    uploadMessage.textContent = "Nessun file selezionato.";
+    uploadMessage.style.color = "red";
     return;
   }
 
@@ -157,17 +145,24 @@ function uploadAvailability() {
     header: true,
     skipEmptyLines: true,
     complete: function (results) {
-      results.data.forEach(row => {
+      const updates = results.data;
+
+      updates.forEach(row => {
         const risorsa = String(row['Risorsa'] || '').trim();
-        const disponibile = normalizeDate(row['Disponibile'] || '');
+        const disponibile = String(row['Disponibile'] || '').trim();
         const item = databaserisorse.find(r => r.risorsa === risorsa);
-        if (item) item.disponibile = disponibile;
+
+        if (item && disponibile) {
+          item.disponibile = disponibile;
+        }
       });
-      saveToLocalStorage();
-      showMessage(msg, "File disponibilità caricato correttamente!", "green");
+
+      uploadMessage.textContent = "File disponibilità caricato correttamente!";
+      uploadMessage.style.color = "green";
     },
     error: function () {
-      showMessage(msg, "Errore caricamento file.", "red");
+      uploadMessage.textContent = "Errore caricamento file.";
+      uploadMessage.style.color = "red";
     }
   });
 }
@@ -182,17 +177,25 @@ function searchResources() {
     return;
   }
 
-  const formattedSearchDate = normalizeDate(searchDate);
-  const searchDateObj = parseDate(formattedSearchDate);
+  const searchDateParts = searchDate.split("-");
+  const formattedSearchDate = `${searchDateParts[2]}/${searchDateParts[1]}/${searchDateParts[0]}`;
 
   const filtered = databaserisorse.filter(r => {
-    const resDateObj = parseDate(r.disponibile);
+    const resDateParts = r.disponibile.split("/");
+    const year = parseInt(resDateParts[2], 10);
+    const fullYear = 2000 + year; // Anno completo a partire da 2000
+    const resDateObj = new Date(fullYear, resDateParts[1] - 1, resDateParts[0]);
+    const searchDateObj = new Date(searchDate);
+
     return r.dimensione >= searchSize && resDateObj >= searchDateObj;
   });
 
   filtered.sort((a, b) => {
-    const dateA = parseDate(a.disponibile);
-    const dateB = parseDate(b.disponibile);
+    const dateAparts = a.disponibile.split("/");
+    const dateBparts = b.disponibile.split("/");
+    const dateA = new Date(2000 + parseInt(dateAparts[2], 10), dateAparts[1] - 1, dateAparts[0]);
+    const dateB = new Date(2000 + parseInt(dateBparts[2], 10), dateBparts[1] - 1, dateBparts[0]);
+
     if (dateA - dateB !== 0) return dateA - dateB;
     if (a.dimensione - b.dimensione !== 0) return a.dimensione - b.dimensione;
     return a.risorsa.localeCompare(b.risorsa);
@@ -220,39 +223,32 @@ function updateAvailability() {
   const selectedDate = dateInput.value;
 
   if (!code || code.length !== 4) {
-    showMessage(message, '⚠️ Inserisci un codice valido di 4 caratteri.', 'orange');
+    message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
     return;
   }
 
   if (!databaserisorse || databaserisorse.length === 0) {
-    showMessage(message, '⚠️ Devi prima caricare il file delle risorse!', 'orange');
+    message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
     return;
   }
 
-  const resource = databaserisorse.find(r => r.risorsa.toUpperCase() === code);
+  const resource = databaserisorse.find(r => {
+    const resCode = (r.risorsa || '').trim().toUpperCase();
+    return resCode === code;
+  });
 
   if (resource) {
-    resource.disponibile = selectedDate ? normalizeDate(selectedDate) : getFormattedDate();
-    saveToLocalStorage();
-    showMessage(message, `✅ La risorsa ${code} è stata occupata con data (${resource.disponibile}).`, 'green');
+    if (selectedDate) {
+      const dateParts = selectedDate.split("-");
+      resource.disponibile = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Data in formato gg/mm/aaaa
+    } else {
+      resource.disponibile = getFormattedDate();
+    }
+    message.innerText = `✅ La risorsa ${code} è stata occupata con data (${resource.disponibile}).`;
+    renderResources(databaserisorse);
     codeInput.value = '';
     dateInput.value = '';
   } else {
-    showMessage(message, '❌ Risorsa non trovata.', 'red');
+    message.innerText = '❌ Risorsa non trovata.';
   }
 }
-
-function exportToCSV() {
-  const csvContent = "data:text/csv;charset=utf-8," +
-    "Risorsa,Dimensione,Disponibile\n" +
-    databaserisorse.map(r => `${r.risorsa},${r.dimensione},${r.disponibile}`).join("\n");
-
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "risorse_aggiornate.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-</script>
