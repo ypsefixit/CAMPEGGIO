@@ -21,102 +21,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
   accordionButtons.forEach(button => {
     button.addEventListener("click", function () {
-      // Ottieni il contenuto associato
       const accordionContent = this.nextElementSibling;
 
-      // Controlla se è già aperto
       if (accordionContent.style.maxHeight) {
         accordionContent.style.maxHeight = null; // Chiudi
       } else {
-        // Chiudi tutti gli altri pannelli
         document.querySelectorAll(".accordion-content").forEach(content => {
           content.style.maxHeight = null;
         });
 
-        // Mostra il contenuto corrente
         accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
       }
     });
   });
 });
 
-window.onload = function() {
+window.onload = function () {
   const updateDateInput = document.getElementById('updateDate');
   if (updateDateInput) {
     updateDateInput.value = getTodayDate();
   }
 };
 
-window.onload = async function() {
-  try {
-    const response = await fetch('risorse.xlsx');
-    const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    databaserisorse = data.slice(1).map(row => ({
-      risorsa: String(row[0] || '').trim(),
-      dimensione: parseFloat(row[1]) || 0,
-      disponibile: getFormattedDate()
-    }));
-
-  } catch (error) {
-    console.error('Errore caricamento risorse:', error);
-  }
-};
-
-function uploadAvailability() {
-  const fileInput = document.getElementById('availabilityFile');
-  const file = fileInput.files[0];
-  const uploadMessage = document.getElementById('uploadMessage');
-
-  if (!file) {
-    uploadMessage.textContent = "Nessun file selezionato.";
-    uploadMessage.style.color = "red";
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    
-    const updates = rows.slice(1);
-
-    updates.forEach(row => {
-      const risorsa = String(row[0] || '').trim();
-      let disponibile = String(row[1] || '').trim();
-
-      // Normalizza la data a gg/mm/aa
-      let parts = disponibile.split("/");
-      if (parts.length === 3 && parts[2].length === 4) {
-        parts[2] = parts[2].slice(-2); // Taglia anno a 2 cifre
-        disponibile = parts.join("/");
-      }
-
-      const item = databaserisorse.find(r => r.risorsa === risorsa);
-      if (item && disponibile) {
-        item.disponibile = disponibile;
-      }
-    });
-
-    uploadMessage.textContent = "File disponibilità caricato correttamente!";
-    uploadMessage.style.color = "green";
-  };
-
-  reader.onerror = function () {
-    uploadMessage.textContent = "Errore caricamento file.";
-    uploadMessage.style.color = "red";
-  };
-
-  reader.readAsArrayBuffer(file);
-}
-
-// Caricamento delle risorse da CSV
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
   const file = fileInput.files[0];
@@ -131,7 +57,7 @@ function uploadResources() {
   Papa.parse(file, {
     header: true, // Utilizza la prima riga come intestazione
     skipEmptyLines: true,
-    complete: function(results) {
+    complete: function (results) {
       databaserisorse = results.data.map(row => ({
         risorsa: String(row['Risorsa'] || '').trim(),
         dimensione: parseFloat(row['Dimensione']) || 0,
@@ -140,9 +66,46 @@ function uploadResources() {
       uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
       uploadResourcesMessage.style.color = "green";
     },
-    error: function() {
+    error: function () {
       uploadResourcesMessage.textContent = "Errore caricamento file.";
       uploadResourcesMessage.style.color = "red";
+    }
+  });
+}
+
+function uploadAvailability() {
+  const fileInput = document.getElementById('availabilityFile');
+  const file = fileInput.files[0];
+  const uploadMessage = document.getElementById('uploadMessage');
+
+  if (!file) {
+    uploadMessage.textContent = "Nessun file selezionato.";
+    uploadMessage.style.color = "red";
+    return;
+  }
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      const updates = results.data;
+
+      updates.forEach(row => {
+        const risorsa = String(row['Risorsa'] || '').trim();
+        const disponibile = String(row['Disponibile'] || '').trim();
+        const item = databaserisorse.find(r => r.risorsa === risorsa);
+
+        if (item && disponibile) {
+          item.disponibile = disponibile;
+        }
+      });
+
+      uploadMessage.textContent = "File disponibilità caricato correttamente!";
+      uploadMessage.style.color = "green";
+    },
+    error: function () {
+      uploadMessage.textContent = "Errore caricamento file.";
+      uploadMessage.style.color = "red";
     }
   });
 }
@@ -175,7 +138,7 @@ function searchResources() {
     const dateBparts = b.disponibile.split("/");
     const dateA = new Date(2000 + parseInt(dateAparts[2], 10), dateAparts[1] - 1, dateAparts[0]);
     const dateB = new Date(2000 + parseInt(dateBparts[2], 10), dateBparts[1] - 1, dateBparts[0]);
-    
+
     if (dateA - dateB !== 0) return dateA - dateB;
     if (a.dimensione - b.dimensione !== 0) return a.dimensione - b.dimensione;
     return a.risorsa.localeCompare(b.risorsa);
@@ -195,43 +158,40 @@ function searchResources() {
 }
 
 function updateAvailability() {
-    const codeInput = document.getElementById('updateCode');
-    const dateInput = document.getElementById('updateDate');
-    const message = document.getElementById('updateMessage');
+  const codeInput = document.getElementById('updateCode');
+  const dateInput = document.getElementById('updateDate');
+  const message = document.getElementById('updateMessage');
 
-    const code = codeInput.value.trim().toUpperCase();
-    const selectedDate = dateInput.value;
+  const code = codeInput.value.trim().toUpperCase();
+  const selectedDate = dateInput.value;
 
-    if (!code || code.length !== 4) {
-        message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
-        return;
-    }
+  if (!code || code.length !== 4) {
+    message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
+    return;
+  }
 
-    if (!databaserisorse || databaserisorse.length === 0) {
-        message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
-        return;
-    }
+  if (!databaserisorse || databaserisorse.length === 0) {
+    message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
+    return;
+  }
 
-    const resource = databaserisorse.find(r => {
-        const resCode = (r.risorsa || '').trim().toUpperCase();
-        return resCode === code;
-    });
+  const resource = databaserisorse.find(r => {
+    const resCode = (r.risorsa || '').trim().toUpperCase();
+    return resCode === code;
+  });
 
-    if (resource) {
-        if (selectedDate) {
-            // Imposta la data selezionata come nuova data di disponibilità
-            const dateParts = selectedDate.split("-");
-            resource.disponibile = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Data in formato gg/mm/aaaa
-        } else {
-            // Se non viene specificata una data, usa quella odierna
-            resource.disponibile = getFormattedDate();
-        }
-        message.innerText = `✅ La risorsa ${code} è stata occupata con data (${resource.disponibile}).`;
-        renderResources(databaserisorse);
-        codeInput.value = '';
-        dateInput.value = '';
+  if (resource) {
+    if (selectedDate) {
+      const dateParts = selectedDate.split("-");
+      resource.disponibile = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Data in formato gg/mm/aaaa
     } else {
-        message.innerText = '❌ Risorsa non trovata.';
+      resource.disponibile = getFormattedDate();
     }
+    message.innerText = `✅ La risorsa ${code} è stata occupata con data (${resource.disponibile}).`;
+    renderResources(databaserisorse);
+    codeInput.value = '';
+    dateInput.value = '';
+  } else {
+    message.innerText = '❌ Risorsa non trovata.';
+  }
 }
-
