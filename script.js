@@ -175,13 +175,19 @@ function updateAvailability() {
     return;
   }
 
-  // Simulazione di aggiornamento
-  if (selectedDate) {
-    message.innerText = `✅ La risorsa ${code} è stata aggiornata con data (${selectedDate}).`;
+  // Cerca la risorsa nel databaserisorse
+  const resource = databaserisorse.find(item => item.risorsa === code);
+
+  if (resource) {
+    // Aggiorna la data di disponibilità
+    resource.disponibile = selectedDate || resource.disponibile;
+
+    message.innerText = `✅ La risorsa ${code} è stata aggiornata con data (${selectedDate || "nessuna modifica alla data"}).`;
     message.style.color = "green";
+    console.log(`Risorsa aggiornata:`, resource);
   } else {
-    message.innerText = `✅ La risorsa ${code} è stata aggiornata senza data.`;
-    message.style.color = "green";
+    message.innerText = `⚠️ La risorsa ${code} non esiste nel database.`;
+    message.style.color = "red";
   }
 
   codeInput.value = '';
