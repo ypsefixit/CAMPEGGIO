@@ -205,10 +205,17 @@ function searchResources() {
   } else {
     filteredResults.forEach(result => {
       const row = document.createElement('tr');
+      
+      // Formattazione della data
+      const dateObj = new Date(result.disponibile);
+      const options = { weekday: 'short' }; // Giorno della settimana (3 lettere)
+      const day = dateObj.getDate();
+      const formattedDate = `${dateObj.toLocaleDateString('it-IT', options)} ${day}`;
+
       row.innerHTML = `
         <td>${result.risorsa}</td>
         <td>${result.dimensione}</td>
-        <td>${result.disponibile}</td>
+        <td>${formattedDate}</td>
       `;
       resultsTable.appendChild(row);
     });
