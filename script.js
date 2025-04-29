@@ -21,19 +21,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   accordionButtons.forEach(button => {
     button.addEventListener("click", function () {
-      const accordionContent = this.nextElementSibling;
+      const accordionContent = this.nextElementSibling; // Il contenuto associato
 
       if (accordionContent.style.maxHeight) {
-        accordionContent.style.maxHeight = null; // Chiudi
+        accordionContent.style.maxHeight = null; // Chiude il contenuto
       } else {
+        // Chiude tutti gli altri contenuti aperti
         document.querySelectorAll(".accordion-content").forEach(content => {
           content.style.maxHeight = null;
         });
 
+        // Apre il contenuto cliccato
         accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
       }
     });
   });
+});
 
   // Caricamento automatico del file risorse.csv
   loadResourcesOnStartup();
