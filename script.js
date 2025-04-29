@@ -129,9 +129,29 @@ function uploadAvailability() {
     header: true,
     skipEmptyLines: true,
     complete: function (results) {
-      console.log("Disponibilità caricata con successo:", results.data);
-      uploadMessage.textContent = "File disponibilità caricato correttamente!";
-      uploadMessage.style.color = "green";
+      const updatedResources = results.data;
+      let updateCount = 0;
+
+      updatedResources.forEach(row => {
+        const risorsa = String(row['risorsa'] || '').trim();
+        const disponibile = row['disponibile'] || '';
+
+        // Cerca la risorsa nel databaserisorse e aggiorna il campo "disponibile"
+        const resource = databaserisorse.find(item => item.risorsa === risorsa);
+        if (resource) {
+          resource.disponibile = disponibile;
+          updateCount++;
+        }
+      });
+
+      if (updateCount > 0) {
+        uploadMessage.textContent = `${updateCount} risorse aggiornate correttamente.`;
+        uploadMessage.style.color = "green";
+        console.log("Risorse aggiornate:", databaserisorse);
+      } else {
+        uploadMessage.textContent = "Nessuna risorsa trovata per l'aggiornamento.";
+        uploadMessage.style.color = "orange";
+      }
     },
     error: function () {
       uploadMessage.textContent = "Errore caricamento file.";
