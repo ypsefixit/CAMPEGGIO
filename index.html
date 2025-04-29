@@ -1,5 +1,4 @@
 <html lang="it">
-  
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +8,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script defer src="script.js"></script>
 </head>
-  
+
 <body>
   
-    <img src="logo.png" alt="Logo Campeggio">
+  <img src="logo.png" alt="Logo Campeggio">
 
-    <h1>CAMPEGGIO</h1>
-    <h2>SANTA MARGHERITA</h2>
+  <h1>CAMPEGGIO</h1>
+  <h2>SANTA MARGHERITA</h2>
 
   <div class="accordion">
 
@@ -26,7 +25,7 @@
         <input type="file" id="resourcesFile" accept=".csv">
         <button type="button" onclick="uploadResources()">Carica</button>
         <p id="uploadResourcesMessage"></p>
-     </form>
+      </form>
     </div>
 
     <button class="accordion-button" type="button">Aggiorna risorse libere</button>
@@ -46,17 +45,17 @@
         <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
         <label for="updateDate">Libera fino a (facoltativo):</label>
         <input type="date" id="updateDate">
-      <button type="button" onclick="updateAvailability()">Aggiorna</button>
-      <p id="updateMessage"></p>
-     </form>
+        <button type="button" onclick="updateAvailability()">Aggiorna</button>
+        <p id="updateMessage"></p>
+      </form>
     </div>
-    
+
     <button class="accordion-button" type="button">Ricerca disponibilità</button>
-      <div class="accordion-content">
-        <form id="form-ricerca">
+    <div class="accordion-content">
+      <form id="form-ricerca">
         <label for="searchDate">Libera fino al:</label>
         <input type="date" id="searchDate">
-    
+
         <label for="searchSize">Lunghezza mezzo:</label>
         <select id="searchSize">
           <option value="5">5</option>
@@ -69,15 +68,15 @@
           <option value="8.5">8.5</option>
           <option value="9">9</option>
         </select>
-      
+
         <button type="button" onclick="searchResources()">Cerca</button>
-    
-        </form>
+
+      </form>
     </div>
 
-</div>
+  </div>
     
-   <table id="tabella-risultati">
+  <table id="tabella-risultati">
     <thead>
       <tr>
         <th>Risorsa</th>
@@ -90,6 +89,5 @@
     </tbody>
   </table>
 
-  
 </body>
 </html>
