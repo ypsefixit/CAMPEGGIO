@@ -13,6 +13,8 @@ h1, h2 {
 }
 h1 { font-size: 2rem; color: #2a2a2a; }
 h2 { font-size: 1.5rem; color: #555; margin-bottom: 30px; }
+
+/* Stile per il pulsante accordion */
 .accordion-button {
   background-color: #00796b;
   color: white;
@@ -24,18 +26,18 @@ h2 { font-size: 1.5rem; color: #555; margin-bottom: 30px; }
   outline: none;
   font-size: 1.2rem;
   transition: background-color 0.3s;
-  border-radius: 8px;
-  margin-bottom: 5px;
 }
 .accordion-button:hover {
   background-color: #004d40;
 }
+
+/* Stile per il contenuto dell'accordion */
 .accordion-content {
   padding: 0 18px;
   background-color: white;
-  max-height: 0;
+  max-height: 0; /* Nasconde il contenuto */
   overflow: hidden;
-  transition: max-height 0.3s ease-out;
+  transition: max-height 0.3s ease-out; /* Animazione apertura */
   border-radius: 8px;
   margin-bottom: 10px;
 }
