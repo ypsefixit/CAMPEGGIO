@@ -24,7 +24,7 @@
       <form id="form-aggiorna-database">
         <label for="file-risorse">Lista risorse</label>
         <input type="file" id="resourcesFile" accept=".csv">
-        <button onclick="uploadResources()">Carica</button>
+        <button type="button" onclick="uploadResources()">Carica</button>
         <p id="uploadResourcesMessage"></p>
      </form>
     </div>
@@ -34,7 +34,7 @@
       <form id="form-aggiorna-risorse">
         <label for="file-risorse">Lista risorse libere</label>
         <input type="file" id="availabilityFile" accept=".csv">
-        <button onclick="uploadAvailability()">Carica</button>
+        <button type="button" onclick="uploadAvailability()">Carica</button>
         <p id="uploadMessage"></p>
       </form>
     </div>
@@ -46,7 +46,7 @@
         <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
         <label for="updateDate">Libera fino a (facoltativo):</label>
         <input type="date" id="updateDate">
-      <button onclick="updateAvailability()">Aggiorna</button>
+      <button type="button" onclick="updateAvailability()">Aggiorna</button>
       <p id="updateMessage"></p>
      </form>
     </div>
@@ -70,7 +70,7 @@
           <option value="9">9</option>
         </select>
       
-        <button onclick="searchResources()">Cerca</button>
+        <button type="button" onclick="searchResources()">Cerca</button>
     
         </form>
     </div>
