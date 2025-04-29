@@ -208,19 +208,9 @@ function searchResources() {
       row.innerHTML = `
         <td>${result.risorsa}</td>
         <td>${result.dimensione}</td>
-        <td>${formatDate(result.disponibile)}</td>
+        <td>${result.disponibile}</td>
       `;
       resultsTable.appendChild(row);
     });
   }
-}
-
-// Funzione per formattare la data in dd/mm
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Mesi da 0 a 11
-  const year = date.getFullYear();
-  return `${day}/${month}`;
-}
 }
