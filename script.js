@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  // Caricamento automatico del file risorse.csv
+  loadResourcesOnStartup();
 });
 
 window.onload = function () {
@@ -42,6 +45,60 @@ window.onload = function () {
     updateDateInput.value = getTodayDate();
   }
 };
+
+function loadResourcesOnStartup() {
+  const uploadResourcesMessage = document.getElementById('uploadResourcesMessage');
+
+  fetch('risorse.csv')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Errore nel caricamento del file risorse.csv: ${response.statusText}`);
+      }
+      return response.text();
+    })
+    .then(csvText => {
+      Papa.parse(csvText, {
+        header: true, // Usa la prima riga come intestazione
+        skipEmptyLines: true,
+        complete: function (results) {
+          databaserisorse = results.data.map(row => ({
+            risorsa: String(row['Risorsa'] || '').trim(),
+            dimensione: parseFloat(row['Dimensione']) || 0,
+            disponibile: row['Disponibile'] || getFormattedDate()
+          }));
+
+          // Feedback visivo
+          if (databaserisorse.length > 0) {
+            console.log("Database risorse caricato correttamente:", databaserisorse);
+            if (uploadResourcesMessage) {
+              uploadResourcesMessage.textContent = "Database risorse caricato correttamente all'avvio!";
+              uploadResourcesMessage.style.color = "green";
+            }
+          } else {
+            console.error("Il file risorse.csv è vuoto o non valido.");
+            if (uploadResourcesMessage) {
+              uploadResourcesMessage.textContent = "Il file risorse.csv è vuoto o non valido.";
+              uploadResourcesMessage.style.color = "red";
+            }
+          }
+        },
+        error: function () {
+          console.error("Errore nella lettura del file risorse.csv.");
+          if (uploadResourcesMessage) {
+            uploadResourcesMessage.textContent = "Errore nella lettura del file risorse.csv.";
+            uploadResourcesMessage.style.color = "red";
+          }
+        }
+      });
+    })
+    .catch(error => {
+      console.error(error.message);
+      if (uploadResourcesMessage) {
+        uploadResourcesMessage.textContent = error.message;
+        uploadResourcesMessage.style.color = "red";
+      }
+    });
+}
 
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
