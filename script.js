@@ -22,7 +22,49 @@ document.addEventListener("DOMContentLoaded", function () {
   loadResourcesOnStartup();
 });
 
-// Funzione per caricare il file risorse.csv all'avvio
+// Funzione per caricare le risorse da un file selezionato
+function uploadResources() {
+  const fileInput = document.getElementById('resourcesFile');
+  const file = fileInput.files[0];
+  const uploadResourcesMessage = document.getElementById('uploadResourcesMessage');
+
+  if (!file) {
+    uploadResourcesMessage.textContent = "Nessun file selezionato.";
+    uploadResourcesMessage.style.color = "red";
+    return;
+  }
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      console.log("File caricato con successo:", results.data);
+
+      // Popola databaserisorse con i dati dal file caricato
+      databaserisorse = results.data.map(row => ({
+        risorsa: String(row['risorsa'] || '').trim(),
+        dimensione: parseFloat(row['dimensione']) || 0,
+        disponibile: row['disponibile'] || getFormattedDate()
+      }));
+
+      // Feedback visivo
+      if (databaserisorse.length > 0) {
+        uploadResourcesMessage.textContent = "Database risorse caricato correttamente!";
+        uploadResourcesMessage.style.color = "green";
+        console.log("Database risorse:", databaserisorse);
+      } else {
+        uploadResourcesMessage.textContent = "Il file caricato è vuoto o non valido.";
+        uploadResourcesMessage.style.color = "red";
+      }
+    },
+    error: function () {
+      uploadResourcesMessage.textContent = "Errore caricamento file.";
+      uploadResourcesMessage.style.color = "red";
+    }
+  });
+}
+
+// Funzione per caricare le risorse automaticamente all'avvio
 function loadResourcesOnStartup() {
   const uploadResourcesMessage = document.getElementById('uploadResourcesMessage');
 
@@ -38,6 +80,7 @@ function loadResourcesOnStartup() {
         header: true, // Usa la prima riga come intestazione
         skipEmptyLines: true,
         complete: function (results) {
+          // Popola databaserisorse con i dati del file
           databaserisorse = results.data.map(row => ({
             risorsa: String(row['risorsa'] || '').trim(),
             dimensione: parseFloat(row['dimensione']) || 0,
@@ -46,7 +89,7 @@ function loadResourcesOnStartup() {
 
           // Feedback visivo
           if (databaserisorse.length > 0) {
-            console.log("Database risorse caricato correttamente:", databaserisorse);
+            console.log("Database risorse caricato correttamente all'avvio:", databaserisorse);
             if (uploadResourcesMessage) {
               uploadResourcesMessage.textContent = "Database risorse caricato correttamente all'avvio!";
               uploadResourcesMessage.style.color = "green";
@@ -76,7 +119,6 @@ function loadResourcesOnStartup() {
       }
     });
 }
-
 // Funzione per ottenere la data corrente formattata (YYYY-MM-DD)
 function getFormattedDate() {
   const date = new Date();
@@ -86,32 +128,7 @@ function getFormattedDate() {
   return `${year}-${month}-${day}`;
 }
 
-// Funzione per caricare le risorse
-function uploadResources() {
-  const fileInput = document.getElementById('resourcesFile');
-  const file = fileInput.files[0];
-  const uploadResourcesMessage = document.getElementById('uploadResourcesMessage');
 
-  if (!file) {
-    uploadResourcesMessage.textContent = "Nessun file selezionato.";
-    uploadResourcesMessage.style.color = "red";
-    return;
-  }
-
-  Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    complete: function (results) {
-      console.log("File caricato con successo:", results.data);
-      uploadResourcesMessage.textContent = "File risorse caricato correttamente!";
-      uploadResourcesMessage.style.color = "green";
-    },
-    error: function () {
-      uploadResourcesMessage.textContent = "Errore caricamento file.";
-      uploadResourcesMessage.style.color = "red";
-    }
-  });
-}
 
 // Funzione per caricare la disponibilità
 function uploadAvailability() {
