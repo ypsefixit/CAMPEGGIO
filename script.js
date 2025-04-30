@@ -118,6 +118,40 @@ function uploadAvailability() {
   });
 }
 
+// Funzione per aggiornare disponibilità singola risorsa
+
+function updateAvailability() {
+    const codeInput = document.getElementById('updateCode');
+    const message = document.getElementById('updateMessage');
+
+    const code = codeInput.value.trim().toUpperCase();
+
+    if (!code || code.length !== 4) {
+        message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
+        return;
+    }
+
+    if (!databaserisorse || databaserisorse.length === 0) {
+        message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
+        return;
+    }
+
+    const resource = databaserisorse.find(r => {
+        const resCode = (r.risorsa || '').trim().toUpperCase();
+        return resCode === code;
+    });
+
+    if (resource) {
+        resource.disponibile = getFormattedDate(); // inserisce la data odierna
+        message.innerText = `✅ La risorsa ${code} è stata occupata oggi (${resource.disponibile}).`;
+        renderResources(databaserisorse);
+        codeInput.value = '';
+    } else {
+        message.innerText = '❌ Risorsa non trovata.';
+    }
+}
+
+
 // Funzione per cercare risorse
 function searchResources() {
   const searchDate = document.getElementById('searchDate').value;
