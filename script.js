@@ -56,7 +56,7 @@ function loadResourcesOnStartup() {
           skipEmptyLines: true,
           complete: function (results) {
             databaserisorse = results.data.map(row => ({
-              risorsa: String(row['risorsa'] || '').trim(),
+              risorsa: extractNumericPart(row['risorsa']),
               dimensione: parseFloat(row['dimensione']) || 0,
               disponibile: row['disponibile'] || getFormattedDate()
             }));
@@ -83,6 +83,12 @@ function loadResourcesOnStartup() {
   }
 }
 
+// Funzione per estrarre la parte numerica di una risorsa e convertirla in 3 caratteri
+function extractNumericPart(risorsa) {
+  const numericPart = risorsa.replace(/\D/g, ''); // Rimuove tutti i caratteri non numerici
+  return numericPart.padStart(3, '0'); // Assicura che sia di 3 caratteri, aggiungendo zeri iniziali se necessario
+}
+
 // Funzione per caricare le risorse da un file selezionato
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
@@ -100,7 +106,7 @@ function uploadResources() {
     skipEmptyLines: true,
     complete: function (results) {
       databaserisorse = results.data.map(row => ({
-        risorsa: String(row['risorsa'] || '').trim(),
+        risorsa: extractNumericPart(row['risorsa']),
         dimensione: parseFloat(row['dimensione']) || 0,
         disponibile: row['disponibile'] || getFormattedDate()
       }));
@@ -120,38 +126,6 @@ function uploadResources() {
       uploadResourcesMessage.style.color = "red";
     }
   });
-}
-
-// Funzione per aggiornare una risorsa manualmente
-function updateAvailability() {
-  const codeInput = document.getElementById('updateCode');
-  const dateInput = document.getElementById('updateDate');
-  const message = document.getElementById('updateMessage');
-
-  const code = codeInput.value.trim().toUpperCase();
-  const selectedDate = dateInput.value;
-
-  if (!code || code.length !== 4) {
-    message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
-    message.style.color = "red";
-    return;
-  }
-
-  const resource = databaserisorse.find(item => item.risorsa === code);
-
-  if (resource) {
-    resource.disponibile = selectedDate || resource.disponibile;
-    saveToLocalStorage();
-    message.innerText = `✅ La risorsa ${code} è stata aggiornata con data (${selectedDate || "nessuna modifica alla data"}).`;
-    message.style.color = "green";
-    console.log(`Risorsa aggiornata:`, resource);
-  } else {
-    message.innerText = `⚠️ La risorsa ${code} non esiste nel database.`;
-    message.style.color = "red";
-  }
-
-  codeInput.value = '';
-  dateInput.value = '';
 }
 
 // Funzione per cercare risorse
