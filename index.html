@@ -18,7 +18,7 @@
 
   <!-- Caricamento risorse -->
   <section class="accordion">
-    <button class="accordion-button">Carica Risorse</button>
+    <button class="accordion-button" aria-expanded="false">Carica Risorse</button>
     <div class="accordion-content">
       <input type="file" id="resourcesFile">
       <button onclick="uploadResources()">Carica</button>
@@ -27,7 +27,7 @@
 
   <!-- Caricamento disponibilità -->
   <section class="accordion">
-    <button class="accordion-button">Carica Disponibilità</button>
+    <button class="accordion-button" aria-expanded="false">Carica Disponibilità</button>
     <div class="accordion-content">
       <input type="file" id="availabilityFile">
       <button onclick="uploadAvailability()">Aggiorna Disponibilità</button>
@@ -37,7 +37,7 @@
 
   <!-- Aggiornamento risorse manuale -->
   <section class="accordion">
-    <button class="accordion-button">Aggiorna Disponibilità Manualmente</button>
+    <button class="accordion-button" aria-expanded="false">Aggiorna Disponibilità Manualmente</button>
     <div class="accordion-content">
       <label for="updateCode">Codice Risorsa (Es: 001):</label>
       <input type="text" id="updateCode" maxlength="4" placeholder="Inserisci codice">
@@ -50,7 +50,7 @@
 
   <!-- Ricerca risorse -->
   <section class="accordion">
-    <button class="accordion-button">Cerca Risorse</button>
+    <button class="accordion-button" aria-expanded="false">Cerca Risorse</button>
     <div class="accordion-content">
       <label for="searchDate">Data Disponibilità Minima:</label>
       <input type="date" id="searchDate">

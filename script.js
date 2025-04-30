@@ -11,11 +11,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (accordionContent.style.maxHeight) {
         accordionContent.style.maxHeight = null; // Chiude il contenuto
+        this.setAttribute("aria-expanded", "false");
       } else {
         document.querySelectorAll(".accordion-content").forEach(content => {
           content.style.maxHeight = null; // Chiude gli altri
         });
+        document.querySelectorAll(".accordion-button").forEach(btn => {
+          btn.setAttribute("aria-expanded", "false");
+        });
         accordionContent.style.maxHeight = accordionContent.scrollHeight + "px"; // Apre il contenuto
+        this.setAttribute("aria-expanded", "true");
       }
     });
   });
@@ -119,38 +124,36 @@ function uploadAvailability() {
 }
 
 // Funzione per aggiornare disponibilità singola risorsa
-
 function updateAvailability() {
-    const codeInput = document.getElementById('updateCode');
-    const message = document.getElementById('updateMessage');
+  const codeInput = document.getElementById('updateCode');
+  const message = document.getElementById('updateMessage');
 
-    const code = codeInput.value.trim().toUpperCase();
+  const code = codeInput.value.trim().toUpperCase();
 
-    if (!code || code.length !== 4) {
-        message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
-        return;
-    }
+  if (!code || code.length !== 4) {
+    message.innerText = '⚠️ Inserisci un codice valido di 4 caratteri.';
+    return;
+  }
 
-    if (!databaserisorse || databaserisorse.length === 0) {
-        message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
-        return;
-    }
+  if (!databaserisorse || databaserisorse.length === 0) {
+    message.innerText = '⚠️ Devi prima caricare il file delle risorse!';
+    return;
+  }
 
-    const resource = databaserisorse.find(r => {
-        const resCode = (r.risorsa || '').trim().toUpperCase();
-        return resCode === code;
-    });
+  const resource = databaserisorse.find(r => {
+    const resCode = (r.risorsa || '').trim().toUpperCase();
+    return resCode === code;
+  });
 
-    if (resource) {
-        resource.disponibile = getFormattedDate(); // inserisce la data odierna
-        message.innerText = `✅ La risorsa ${code} è stata occupata oggi (${resource.disponibile}).`;
-        renderResources(databaserisorse);
-        codeInput.value = '';
-    } else {
-        message.innerText = '❌ Risorsa non trovata.';
-    }
+  if (resource) {
+    resource.disponibile = new Date().toISOString().split('T')[0]; // Data odierna
+    message.innerText = `✅ La risorsa ${code} è stata aggiornata oggi (${resource.disponibile}).`;
+    saveToLocalStorage();
+    codeInput.value = '';
+  } else {
+    message.innerText = '❌ Risorsa non trovata.';
+  }
 }
-
 
 // Funzione per cercare risorse
 function searchResources() {
