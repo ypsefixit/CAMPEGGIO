@@ -72,6 +72,7 @@ footer {
   font-size: 1rem;
   cursor: pointer;
   outline: none;
+  transition: background-color 0.3s ease;
 }
 
 .accordion-button:hover {
@@ -79,21 +80,14 @@ footer {
 }
 
 .accordion-content {
-  display: none;
-  padding: 1rem;
-  border-top: 1px solid #ddd;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+  padding: 0 1rem;
 }
 
-.accordion-content input,
-.accordion-content button {
-  display: block;
-  width: 100%;
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-sizing: border-box;
+.accordion-content div {
+  margin: 1rem 0;
 }
 
 .accordion-content table {
@@ -124,11 +118,6 @@ footer {
 
 /* Responsive */
 @media (max-width: 600px) {
-  .accordion-content input,
-  .accordion-content button {
-    font-size: 0.9rem;
-  }
-
   .accordion-content table {
     font-size: 0.85rem;
   }
