@@ -1,101 +1,79 @@
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campeggio Santa Margherita</title>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script defer src="script.js"></script>
+  <title>Gestione Risorse</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="resource-management.js"></script>
 </head>
-
 <body>
-  
-  <img src="logo.png" alt="Logo Campeggio">
+  <header>
+    <h1>Gestione Risorse</h1>
+  </header>
 
-  <h1>CAMPEGGIO</h1>
-  <h2>SANTA MARGHERITA</h2>
+  <!-- Messaggi di stato -->
+  <div id="uploadResourcesMessage" class="message"></div>
 
-  <div class="accordion">
-
-    <button class="accordion-button" type="button">
-      Aggiorna risorse <span class="arrow">▼</span>
-    </button>
+  <!-- Caricamento risorse -->
+  <section class="accordion">
+    <button class="accordion-button">Carica Risorse</button>
     <div class="accordion-content">
-      <form id="form-aggiorna-database">
-        <label for="file-risorse">Lista risorse</label>
-        <input type="file" id="resourcesFile" accept=".csv">
-        <button type="button" onclick="uploadResources()">Carica</button>
-        <p id="uploadResourcesMessage"></p>
-      </form>
+      <input type="file" id="resourcesFile">
+      <button onclick="uploadResources()">Carica</button>
     </div>
+  </section>
 
-    <button class="accordion-button" type="button">
-      Aggiorna risorse libere <span class="arrow">▼</span>
-    </button>
+  <!-- Caricamento disponibilità -->
+  <section class="accordion">
+    <button class="accordion-button">Carica Disponibilità</button>
     <div class="accordion-content">
-      <form id="form-aggiorna-risorse">
-        <label for="file-risorse">Lista risorse libere</label>
-        <input type="file" id="availabilityFile" accept=".csv">
-        <button type="button" onclick="uploadAvailability()">Carica</button>
-        <p id="uploadMessage"></p>
-      </form>
+      <input type="file" id="availabilityFile">
+      <button onclick="uploadAvailability()">Aggiorna Disponibilità</button>
+      <div id="uploadMessage" class="message"></div>
     </div>
+  </section>
 
-    <button class="accordion-button" type="button">
-      Aggiorna singola risorsa <span class="arrow">▼</span>
-    </button>
+  <!-- Aggiornamento risorse manuale -->
+  <section class="accordion">
+    <button class="accordion-button">Aggiorna Disponibilità Manualmente</button>
     <div class="accordion-content">
-      <form id="form-aggiorna-singola">
-        <label for="updateCode">Risorsa (4 caratteri):</label>
-        <input type="text" id="updateCode" maxlength="4" placeholder="Es: A123">
-        <label for="updateDate">Libera fino a (facoltativo):</label>
-        <input type="date" id="updateDate">
-        <button type="button" onclick="updateAvailability()">Aggiorna</button>
-        <p id="updateMessage"></p>
-      </form>
+      <label for="updateCode">Codice Risorsa (Es: 001):</label>
+      <input type="text" id="updateCode" maxlength="4" placeholder="Inserisci codice">
+      <label for="updateDate">Data Disponibilità (YYYY-MM-DD):</label>
+      <input type="date" id="updateDate">
+      <button onclick="updateAvailability()">Aggiorna</button>
+      <div id="updateMessage" class="message"></div>
     </div>
+  </section>
 
-    <button class="accordion-button" type="button">
-      Ricerca disponibilità <span class="arrow">▼</span>
-    </button>
+  <!-- Ricerca risorse -->
+  <section class="accordion">
+    <button class="accordion-button">Cerca Risorse</button>
     <div class="accordion-content">
-      <form id="form-ricerca">
-        <label for="searchDate">Libera fino al:</label>
-        <input type="date" id="searchDate">
+      <label for="searchDate">Data Disponibilità Minima:</label>
+      <input type="date" id="searchDate">
+      <label for="searchSize">Dimensione Minima:</label>
+      <input type="number" id="searchSize" step="0.1" placeholder="Es: 5.0">
+      <button onclick="searchResources()">Cerca</button>
 
-        <label for="searchSize">Lunghezza mezzo:</label>
-        <select id="searchSize">
-          <option value="5">5</option>
-          <option value="5.5">5.5</option>
-          <option value="6">6</option>
-          <option value="6.5">6.5</option>
-          <option value="7">7</option>
-          <option value="7.5">7.5</option>
-          <option value="8">8</option>
-          <option value="8.5">8.5</option>
-          <option value="9">9</option>
-        </select>
-
-        <button type="button" onclick="searchResources()">Cerca</button>
-
-      </form>
+      <table id="tabella-risultati">
+        <thead>
+          <tr>
+            <th>Risorsa</th>
+            <th>Dimensione</th>
+            <th>Disponibilità</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Risultati della ricerca -->
+        </tbody>
+      </table>
     </div>
+  </section>
 
-  </div>
-    
-  <table id="tabella-risultati">
-    <thead>
-      <tr>
-        <th>Risorsa</th>
-        <th>Dimensione</th>
-        <th>Libera fino a</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Risultati -->
-    </tbody>
-  </table>
-
+  <footer>
+    <p>Gestione Risorse © 2025</p>
+  </footer>
 </body>
 </html>
