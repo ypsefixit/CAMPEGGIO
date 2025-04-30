@@ -1,5 +1,8 @@
+// Inizializza il database delle risorse
+let databaserisorse = [];
+
+// Gestione degli accordion
 document.addEventListener("DOMContentLoaded", function () {
-  // Gestione accordion
   const accordionButtons = document.querySelectorAll(".accordion-button");
 
   accordionButtons.forEach(button => {
@@ -12,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".accordion-content").forEach(content => {
           content.style.maxHeight = null; // Chiude gli altri
         });
-
         accordionContent.style.maxHeight = accordionContent.scrollHeight + "px"; // Apre il contenuto
       }
     });
@@ -33,63 +35,21 @@ function loadFromLocalStorage() {
   return savedData ? JSON.parse(savedData) : null;
 }
 
-// Funzione per caricare le risorse automaticamente all'avvio
+// Caricamento iniziale delle risorse
 function loadResourcesOnStartup() {
   const uploadResourcesMessage = document.getElementById('uploadResourcesMessage');
   databaserisorse = loadFromLocalStorage();
 
   if (databaserisorse) {
     uploadResourcesMessage.textContent = "Database risorse caricato correttamente dal salvataggio locale!";
-    uploadResourcesMessage.style.color = "green";
-    console.log("Database risorse caricato da localStorage:", databaserisorse);
+    uploadResourcesMessage.classList.add("success");
   } else {
-    fetch('risorse.csv')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Errore nel caricamento del file risorse.csv: ${response.statusText}`);
-        }
-        return response.text();
-      })
-      .then(csvText => {
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: function (results) {
-            databaserisorse = results.data.map(row => ({
-              risorsa: extractNumericPart(row['risorsa']),
-              dimensione: parseFloat(row['dimensione']) || 0,
-              disponibile: row['disponibile'] || getFormattedDate()
-            }));
-
-            if (databaserisorse.length > 0) {
-              saveToLocalStorage();
-              uploadResourcesMessage.textContent = "Database risorse caricato correttamente all'avvio!";
-              uploadResourcesMessage.style.color = "green";
-              console.log("Database risorse caricato correttamente all'avvio:", databaserisorse);
-            } else {
-              throw new Error("Il file risorse.csv è vuoto o non valido.");
-            }
-          },
-          error: function () {
-            throw new Error("Errore nella lettura del file risorse.csv.");
-          }
-        });
-      })
-      .catch(error => {
-        console.error(error.message);
-        uploadResourcesMessage.textContent = error.message;
-        uploadResourcesMessage.style.color = "red";
-      });
+    uploadResourcesMessage.textContent = "Nessun database trovato. Carica un file per iniziare.";
+    uploadResourcesMessage.classList.add("error");
   }
 }
 
-// Funzione per estrarre la parte numerica di una risorsa e convertirla in 3 caratteri
-function extractNumericPart(risorsa) {
-  const numericPart = risorsa.replace(/\D/g, ''); // Rimuove tutti i caratteri non numerici
-  return numericPart.padStart(3, '0'); // Assicura che sia di 3 caratteri, aggiungendo zeri iniziali se necessario
-}
-
-// Funzione per caricare le risorse da un file selezionato
+// Funzione per caricare risorse da file CSV
 function uploadResources() {
   const fileInput = document.getElementById('resourcesFile');
   const file = fileInput.files[0];
@@ -97,7 +57,7 @@ function uploadResources() {
 
   if (!file) {
     uploadResourcesMessage.textContent = "Nessun file selezionato.";
-    uploadResourcesMessage.style.color = "red";
+    uploadResourcesMessage.classList.add("error");
     return;
   }
 
@@ -106,24 +66,54 @@ function uploadResources() {
     skipEmptyLines: true,
     complete: function (results) {
       databaserisorse = results.data.map(row => ({
-        risorsa: extractNumericPart(row['risorsa']),
+        risorsa: row['risorsa'] || '',
         dimensione: parseFloat(row['dimensione']) || 0,
-        disponibile: row['disponibile'] || getFormattedDate()
+        disponibile: row['disponibile'] || new Date().toISOString().split('T')[0]
       }));
 
-      if (databaserisorse.length > 0) {
-        saveToLocalStorage();
-        uploadResourcesMessage.textContent = "Database risorse caricato correttamente!";
-        uploadResourcesMessage.style.color = "green";
-        console.log("Database risorse:", databaserisorse);
-      } else {
-        uploadResourcesMessage.textContent = "Il file caricato è vuoto o non valido.";
-        uploadResourcesMessage.style.color = "red";
-      }
+      saveToLocalStorage();
+      uploadResourcesMessage.textContent = "Database risorse caricato correttamente!";
+      uploadResourcesMessage.classList.add("success");
     },
     error: function () {
-      uploadResourcesMessage.textContent = "Errore caricamento file.";
-      uploadResourcesMessage.style.color = "red";
+      uploadResourcesMessage.textContent = "Errore nel caricamento del file.";
+      uploadResourcesMessage.classList.add("error");
+    }
+  });
+}
+
+// Funzione per aggiornare disponibilità
+function uploadAvailability() {
+  const fileInput = document.getElementById('availabilityFile');
+  const file = fileInput.files[0];
+  const uploadMessage = document.getElementById('uploadMessage');
+
+  if (!file) {
+    uploadMessage.textContent = "Nessun file selezionato.";
+    uploadMessage.classList.add("error");
+    return;
+  }
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      let updates = 0;
+      results.data.forEach(row => {
+        const resource = databaserisorse.find(r => r.risorsa === row['risorsa']);
+        if (resource) {
+          resource.disponibile = row['disponibile'];
+          updates++;
+        }
+      });
+
+      saveToLocalStorage();
+      uploadMessage.textContent = `${updates} disponibilità aggiornate correttamente.`;
+      uploadMessage.classList.add("success");
+    },
+    error: function () {
+      uploadMessage.textContent = "Errore nel caricamento del file.";
+      uploadMessage.classList.add("error");
     }
   });
 }
@@ -165,13 +155,4 @@ function searchResources() {
       resultsTable.appendChild(row);
     });
   }
-}
-
-// Funzione per ottenere la data corrente formattata (YYYY-MM-DD)
-function getFormattedDate() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }
